@@ -49,7 +49,7 @@ def generate_content(client: genai.Client, user_input:str) -> types.GenerateCont
     return generated_content
 
 
-def print_outputs(user_input, generated_content=types.GenerateContentResponse, verbose=False):
+def print_outputs(user_input, generated_content: types.GenerateContentResponse, verbose=False):
     if verbose:
         print(f'User prompt: {user_input}')
         print(f'Prompt tokens: {generated_content.usage_metadata.prompt_token_count}') # type: ignore
