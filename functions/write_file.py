@@ -10,7 +10,9 @@ def write_file(working_directory, file_path, content):
             os.path.join(working_dir_abs, file_path)
         )
         
-        is_a_valid_file = os.path.commonpath([working_dir_abs, target_file]) == working_dir_abs 
+        is_a_valid_file = os.path.commonpath(
+                [working_dir_abs, target_file]
+            ) == working_dir_abs 
 
         if not is_a_valid_file:
             raise Exception(
@@ -21,8 +23,6 @@ def write_file(working_directory, file_path, content):
             raise Exception(
                 f'Error: Cannot write to "{file_path}" as it is a directory'
             )
-
-        
 
         with open(target_file, "w") as f:
             f.write(content)
