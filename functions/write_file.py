@@ -1,4 +1,35 @@
 import os
+from google.genai import types
+
+
+def get_llm_schema_write_file():
+    return types.FunctionDeclaration(
+        name="write_file",
+        description="Write the content inside a file.",
+        parameters=types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "working_directory": types.Schema(
+                    type=types.Type.STRING,
+                    description="Directory path to list files from, "
+                    "relative to the working directory (default is the working directory itself)",
+                ),
+                "file_path": types.Schema(
+                    type=types.Type.STRING,
+                    description="file name, "
+                    "present on the directory, that we want to write"
+                ),
+                "content": types.Schema(
+                    type=types.Type.STRING,
+                    description="The content to be writed on file."
+                )
+            },
+        ),
+    )
+
+
+
+
 
 
 def write_file(working_directory, file_path, content):

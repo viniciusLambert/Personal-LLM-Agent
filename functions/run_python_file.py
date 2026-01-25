@@ -1,6 +1,30 @@
 import os
 import subprocess
+from google.genai import types
 
+def get_llm_schema_run_python_file():
+    return types.FunctionDeclaration(
+        name="run_python_file",
+        description="Run a python script",
+        parameters=types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "working_directory": types.Schema(
+                    type=types.Type.STRING,
+                    description="The working directory."
+                ),
+                "file_path": types.Schema(
+                    type=types.Type.STRING,
+                    description="file name, "
+                    "from the python file present on the directory, that we want to run"
+                ),
+                "args": types.Schema(
+                    type=types.Type.STRING,
+                    description="args to pass when call the python function"
+                )
+            },
+        ),
+    )
 
 def run_python_file(working_directory, file_path, args=None):
     try:

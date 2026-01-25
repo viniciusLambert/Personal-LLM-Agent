@@ -3,18 +3,22 @@ from google.genai import types
 
 def get_llm_schema_files_info():
     return types.FunctionDeclaration(
-    name="get_files_info",
-    description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
-    parameters=types.Schema(
-        type=types.Type.OBJECT,
-        properties={
-            "directory": types.Schema(
-                type=types.Type.STRING,
-                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
-            ),
-        },
-    ),
-)
+        name="get_files_info",
+        description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
+        parameters=types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "working_directory": types.Schema(
+                    type=types.Type.STRING,
+                    description="The working directory",
+                ),
+                "directory": types.Schema(
+                    type=types.Type.STRING,
+                    description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+                ),
+            },
+        ),
+    )
 
 
 def get_files_info(working_directory, directory="."):
@@ -40,9 +44,10 @@ def get_files_info(working_directory, directory="."):
         for item in dir_content:
             item_dir = target_dir + '/' + item
             is_dir = os.path.isdir(item_dir)
-            file_infos += f'- {item}: file_size={os.path.getsize(item_dir)} bytes, is_dir={is_dir}'
+            file_infos += f'- {item}: file_size={os.path.getsize(item_dir)} bytes, is_dir={is_dir}\n'
     
-    
+        return file_infos
+     
     except Exception as e:
         print(f"Error {e}.")
         return f'Error: {e}'
