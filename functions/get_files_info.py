@@ -1,5 +1,20 @@
 import os
+from google.genai import types
 
+def get_llm_schema_files_info():
+    return types.FunctionDeclaration(
+    name="get_files_info",
+    description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+            ),
+        },
+    ),
+)
 
 
 def get_files_info(working_directory, directory="."):
@@ -20,11 +35,14 @@ def get_files_info(working_directory, directory="."):
         dir_content = os.listdir(target_dir)
 
         current_directory = 'current' if directory == '.' else f"'{directory}'"
-        print(f"Result for {current_directory} directory:")
+        file_infos = ""
+        file_infos += f"Result for {current_directory} directory:"
         for item in dir_content:
             item_dir = target_dir + '/' + item
             is_dir = os.path.isdir(item_dir)
-            print(f'- {item}: file_size={os.path.getsize(item_dir)} bytes, is_dir={is_dir}')
+            file_infos += f'- {item}: file_size={os.path.getsize(item_dir)} bytes, is_dir={is_dir}'
+    
+    
     except Exception as e:
         print(f"Error {e}.")
         return f'Error: {e}'

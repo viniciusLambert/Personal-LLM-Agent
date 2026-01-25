@@ -3,7 +3,8 @@ import argparse
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-
+from prompt import system_prompt
+from call_function import available_functions
 
 
 def main():
@@ -41,7 +42,13 @@ def generate_content(client: genai.Client, user_input:str) -> types.GenerateCont
     messages = [types.Content(role="user", parts=[types.Part(text=user_input)])] 
     generated_content = client._models.generate_content(
         model='gemini-2.5-flash', 
-        contents=messages)
+        contents=messages,
+        config=types.GenerateContentConfig(
+            tools=[available_functions],
+            system_instruction=system_prompt,
+            temperature=0
+        )    
+    )
 
     if not generated_content.usage_metadata:
         raise RuntimeError('api not found')
@@ -51,10 +58,21 @@ def generate_content(client: genai.Client, user_input:str) -> types.GenerateCont
 
 def print_outputs(user_input, generated_content: types.GenerateContentResponse, verbose=False):
     if verbose:
-        print(f'User prompt: {user_input}')
-        print(f'Prompt tokens: {generated_content.usage_metadata.prompt_token_count}') # type: ignore
-        print(f'Response tokens: {generated_content.usage_metadata.candidates_token_count}') # type: ignore
+        print_headers(user_input=user_input, usage_metadata=generated_content.usage_metadata)
+    print_functions_call(generated_content.function_calls)
     print(generated_content.text)
+
+def print_headers(user_input, usage_metadata):
+    print(f'User prompt: {user_input}')
+    print(f'Prompt tokens: {usage_metadata.prompt_token_count}') # type: ignore
+    print(f'Response tokens: {usage_metadata.candidates_token_count}') # type: ignore
+
+def print_functions_call(function_calls):
+    if(not function_calls):
+        return
+    for function_call in function_calls:
+        print(f"Calling function: {function_call.name}({function_call.args})")    
+    return
 
 if __name__ == "__main__":
     main()
