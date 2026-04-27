@@ -1,125 +1,93 @@
 # Personal LLM Agent Framework
 
-Um framework de agente autônomo de IA construído com Python que permite ao modelo de linguagem (Google Gemini) agir como um agente capaz de executar tarefas complexas de forma independente.
+Autonomous AI agent built with Python and Google Gemini that executes complex tasks independently through function calling and an agentic loop.
 
-## Visão Geral
+## Motivation
 
-Este projeto implementa um **Agente de IA Autônomo** que pode:
-- Navegar pelo sistema de arquivos
-- Ler e escrever arquivos
-- Executar scripts Python
-- Tomar decisões baseadas nos resultados de suas ações
-- Completar tarefas complexas através de múltiplas iterações
+Built as a learning project on [Boot.dev](https://boot.dev) to explore core patterns behind autonomous LLM agents.
 
-O agente opera em um loop contínuo onde analisa a tarefa, executa ações, avalia os resultados e continua até completar o objetivo.
+The agent can navigate the filesystem, read/write files, execute Python scripts, and make decisions based on the results of its actions — completing complex tasks across multiple iterations without human intervention.
 
-## Técnicas Implementadas
+Key techniques demonstrated:
 
-### Function Calling (Tool Use)
+- **Function Calling (Tool Use)** — structured schema-based invocation of Python functions by the LLM
+- **Agentic Loop** — autonomous loop with full conversation history, iteration limit, and self-termination
+- **Security Sandboxing** — directory traversal prevention; agent confined to its working directory
+- **Dynamic Function Dispatch** — dictionary-based mapping from LLM calls to Python functions
+- **Process Execution** — safe subprocess execution with timeout and stdout/stderr capture
+- **Message History Management** — multi-turn context kept across all iterations of a task
 
-Técnica avançada que permite ao LLM invocar funções Python de forma estruturada. Cada função possui um schema definido que o modelo utiliza para fazer chamadas corretas, permitindo que o agente interaja com o sistema de forma controlada.
+## Quick Start
 
-### Agentic Loop
+**Prerequisites:** Python 3.13+, [Google Gemini API key](https://aistudio.google.com/)
 
-Loop autônomo que permite ao LLM operar de forma independente. O agente mantém histórico completo da conversa, possui limite de iterações para prevenir loops infinitos, e encerra automaticamente quando decide que a tarefa está completa.
-
-### Sandboxing de Segurança
-
-Todas as operações de arquivo são validadas para prevenir ataques de **Directory Traversal**. O agente só pode operar dentro do diretório de trabalho designado, garantindo isolamento e segurança.
-
-### Dynamic Function Dispatch
-
-Padrão de dispatch dinâmico que mapeia chamadas do LLM para funções Python através de um dicionário de funções, permitindo extensibilidade e manutenção simplificada.
-
-### Process Execution
-
-Execução segura de scripts Python com timeout e captura de output (stdout/stderr), permitindo que o agente execute e teste código de forma controlada.
-
-### Message History Management
-
-Gerenciamento do histórico de mensagens para manter contexto multi-turn, permitindo que o agente mantenha consciência de todas as ações anteriores durante a execução de uma tarefa.
-
-## Ferramentas do Agente
-
-| Ferramenta | Descrição |
-|------------|-----------|
-| `get_files_info` | Lista arquivos em um diretório com metadados |
-| `get_file_content` | Lê o conteúdo de um arquivo |
-| `write_file` | Cria ou sobrescreve arquivos |
-| `run_python_file` | Executa scripts Python e captura o output |
-
-## Estrutura do Projeto
-
-```
-personal-llm/
-├── main.py                 # Entry point e loop principal do agente
-├── call_function.py        # Dispatcher de funções e definições de tools
-├── prompt.py               # System prompt para o LLM
-├── config.py               # Constantes de configuração
-├── functions/              # Implementação das ferramentas
-│   ├── get_files_info.py
-│   ├── get_file_content.py
-│   ├── write_file.py
-│   └── run_python_file.py
-└── calculator/             # Projeto de exemplo para testes
-```
-
-## Tecnologias
-
-- **Python 3.13+**
-- **Google Gemini 2.5-Flash** - Modelo de linguagem
-- **google-genai** - SDK do Google para Generative AI
-- **python-dotenv** - Gerenciamento de variáveis de ambiente
-
-## Instalação
-
-1. Clone o repositório
-2. Crie um ambiente virtual e instale as dependências:
 ```bash
+git clone <repo-url>
+cd personal-llm
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Configure a API key do Google em um arquivo `.env`:
+Create a `.env` file:
+
 ```
-GEMINI_API_KEY=sua_api_key
+GEMINI_API_KEY=your_api_key_here
 ```
 
-## Uso
+**Tech stack:** Python 3.13 · Google Gemini 2.5-Flash · google-genai · python-dotenv
+
+**Project structure:**
+
+```
+personal-llm/
+├── main.py                 # Entry point and agent loop
+├── call_function.py        # Function dispatcher and tool definitions
+├── prompt.py               # System prompt for the LLM
+├── config.py               # Configuration constants
+├── functions/              # Tool implementations
+│   ├── get_files_info.py
+│   ├── get_file_content.py
+│   ├── write_file.py
+│   └── run_python_file.py
+└── calculator/             # Example project for testing
+```
+
+## Usage
 
 ```bash
-python main.py "Sua tarefa aqui"
-python main.py --verbose "Sua tarefa aqui"  # modo debug
+python main.py "Your task here"
+python main.py --verbose "Your task here"   # debug output
 ```
 
-## Fluxo de Execução
+**Available agent tools:**
+
+| Tool | Description |
+|------|-------------|
+| `get_files_info` | List files in a directory with metadata |
+| `get_file_content` | Read file contents |
+| `write_file` | Create or overwrite files |
+| `run_python_file` | Execute a Python script and capture output |
+
+**Execution flow:**
 
 ```
-Usuário fornece tarefa
-        │
-        ▼
-   LLM analisa e responde
-        │
-        ▼
-   Tem function calls? ──SIM──▶ Executa funções
-        │                              │
-       NÃO                             │
-        │                              │
-        ▼                              │
-   Resposta final ◀────────────────────┘
+User provides task
+       │
+       ▼
+  LLM analyzes and responds
+       │
+       ▼
+  Has function calls? ──YES──▶ Execute functions
+       │                              │
+       NO                             │
+       │                              │
+       ▼                              │
+  Final response ◀───────────────────┘
 ```
 
-## Aprendizados
+## Contributing
 
-Projeto desenvolvido na plataforma [Boot.dev](https://boot.dev), demonstrando:
+Bug reports and feature requests: open an issue.
 
-- Integração com APIs de LLM
-- Padrões de Agentes de IA autônomos
-- Segurança em aplicações de IA (sandboxing)
-- Arquitetura modular e extensível
-- Function Calling para estender capacidades de LLMs
-
----
-
-Desenvolvido como projeto educacional na plataforma [Boot.dev](https://boot.dev)
+Pull requests are welcome. Please follow the existing code style and keep tool implementations self-contained under `functions/`.
